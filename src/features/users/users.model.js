@@ -1,3 +1,5 @@
+// Would return a different user object based on the endpoint!!!
+
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 
@@ -26,22 +28,30 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.methods.toUserResponse = () => {
+const getCreateUserResponse = (user) => {
+  return getUser(user);
+};
+
+const getLoginUserResponse = (user) => {
+  return getUser(user);
+}
+
+const getUser = (user) => {
   return {
-    email: this.email,
-    username: this.username,
-    bio: this.bio,
-    image: this.image,
-    token: this.getAccessToken(),
+    email: user.email,
+    username: user.username,
+    bio: user.bio || null,
+    image: user.image || null,
+    token: getAccessToken(user),
   };
 };
 
-userSchema.methods.getAccessToken = () => {
+const getAccessToken = (user) => {
   const accessToken = jwt.sign(
     {
       user: {
-        id: this._id,
-        email: this.email,
+        id: user._id,
+        email: user.email,
       },
     },
     process.env.ACCESS_TOKEN_SECRET,
@@ -50,4 +60,8 @@ userSchema.methods.getAccessToken = () => {
   return accessToken;
 };
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = {
+  User: mongoose.model("User", userSchema),
+  getCreateUserResponse,
+  getLoginUserResponse,
+}

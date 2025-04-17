@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 
-const User = require("./users.model");
-const { createUserValidator } = require("./users.validator");
+const {User, getCreateUserResponse, getLoginUserResponse} = require("./users.model");
+const { getValidationErrorResponse, createUserValidator, loginUserValidator } = require("./users.validator");
 
 // Example comments for an API endpoint
 /// @desc    Create a new user
@@ -20,7 +20,7 @@ const createUser = async (req, res) => {
   const { error, value } = createUserValidator.validate(req.body);
 
   if (error) {
-    return res.status(400).json({ error: error.details[0].message });
+    return res.status(422).json(getValidationErrorResponse(error));
   }
 
   const { username, email, password } = value.user;
@@ -39,9 +39,31 @@ const createUser = async (req, res) => {
     return res.status(500).json({ error: "User creation failed" });
   }
 
-  return res.status(201).json({ user: createdUser.toUserResponse() });
+  return res.status(201).json({ user: getCreateUserResponse(createdUser) });
 };
+
+const loginUser = async (req, res) => {
+  const { error, value } = loginUserValidator.validate(req.body);
+  if (error) {
+    return res.status(422).json(getValidationErrorResponse(error));
+  }
+
+  const { email, password } = value.user;
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(401).json({ error: "Invalid email or password" });
+  }
+
+  const passwordMatch = await bcrypt.compare(password, user.passwordHash);
+  if (!passwordMatch) {
+    return res.status(401).json({ error: "Invalid email or password" });
+  }
+
+  return res.status(200).json({ user: getLoginUserResponse(user) });
+}
 
 module.exports = {
   createUser,
+  loginUser,
 };
