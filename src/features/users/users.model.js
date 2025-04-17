@@ -39,6 +39,10 @@ const getUserResponse = (user) => {
   return getUser(user);
 }
 
+const getUpdateUserResponse = (user) => {
+  return getUser(user);
+};
+
 const getUser = (user) => {
   return {
     email: user.email,
@@ -68,4 +72,5 @@ module.exports = {
   getCreateUserResponse,
   getLoginUserResponse,
   getUserResponse,
+  getUpdateUserResponse,
 }

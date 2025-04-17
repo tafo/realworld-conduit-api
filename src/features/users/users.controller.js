@@ -1,7 +1,13 @@
 const bcrypt = require("bcrypt");
 
-const {User, getCreateUserResponse, getLoginUserResponse, getUserResponse} = require("./users.model");
-const { getValidationErrorResponse, createUserValidator, loginUserValidator } = require("./users.validator");
+const {
+  User,
+  getCreateUserResponse,
+  getLoginUserResponse,
+  getUserResponse,
+  getUpdateUserResponse,
+} = require("./users.model");
+const { createUserValidator, loginUserValidator, updateUserValidator } = require("./users.validator");
 
 // Example comments for an API endpoint
 /// @desc    Create a new user
@@ -20,7 +26,7 @@ const createUser = async (req, res) => {
   const { error, value } = createUserValidator.validate(req.body);
 
   if (error) {
-    return res.status(422).json(getValidationErrorResponse(error));
+    return res.status(422).json({ error: error.details[0].message });
   }
 
   const { username, email, password } = value.user;
@@ -45,7 +51,7 @@ const createUser = async (req, res) => {
 const loginUser = async (req, res) => {
   const { error, value } = loginUserValidator.validate(req.body);
   if (error) {
-    return res.status(422).json(getValidationErrorResponse(error));
+    return res.status(422).json({ error: error.details[0].message });
   }
 
   const { email, password } = value.user;
@@ -61,10 +67,10 @@ const loginUser = async (req, res) => {
   }
 
   return res.status(200).json({ user: getLoginUserResponse(user) });
-}
+};
 
 const getUser = async (req, res) => {
-  const {id, email} = req.user;
+  const { id } = req.user;
   const user = await User.findById(id);
   if (!user) {
     return res.status(404).json({ error: "User not found" });
@@ -73,9 +79,41 @@ const getUser = async (req, res) => {
   return res.status(200).json({ user: getUserResponse(user) });
 };
 
+// Email and password are not required for this endpoint. They should be handled in another endpoint.
+const updateUser = async (req, res) => {
+  const { error, value } = updateUserValidator.validate(req.body);
+  if (error) {
+    return res.status(422).json({ error: error.details[0].message });
+  }
+
+  const { id } = req.user;
+  const { username, bio, image } = value.user;
+
+  const user = await User.findById(id);
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  const existingUser = await User.findOne({ username });
+  if (existingUser && existingUser.id !== id) {
+    return res.status(409).json({ error: "Username already exists" });
+  }
+
+  user.username = username;
+  user.bio = bio;
+  user.image = image;
+
+  const updatedUser = await user.save();
+  if (!updatedUser) {
+    return res.status(500).json({ error: "User update failed" });
+  }
+
+  return res.status(200).json({ user: getUpdateUserResponse(updatedUser) });
+};
 
 module.exports = {
   createUser,
   loginUser,
   getUser,
+  updateUser,
 };

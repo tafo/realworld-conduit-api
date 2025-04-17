@@ -1,13 +1,5 @@
 const Joi = require('joi');
 
-const getValidationErrorResponse = (error) => {
-  return {
-    errors: {
-      body: error.details.map(detail => detail.message)
-    }
-  };
-};
-
 const createUserValidator = Joi.object({
   user: Joi.object({
     username: Joi.string().required(),
@@ -23,8 +15,17 @@ const loginUserValidator = Joi.object({
   }).required()
 });
 
+const updateUserValidator = Joi.object({
+  user: Joi.object({
+    username: Joi.string().optional(),
+    password: Joi.string().optional(),
+    bio: Joi.string().optional(),
+    image: Joi.string().optional(),
+  }).required()
+});
+
 module.exports = {
-  getValidationErrorResponse,
   createUserValidator,
   loginUserValidator,
+  updateUserValidator,
 };
