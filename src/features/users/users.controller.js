@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 
-const {User, getCreateUserResponse, getLoginUserResponse} = require("./users.model");
+const {User, getCreateUserResponse, getLoginUserResponse, getUserResponse} = require("./users.model");
 const { getValidationErrorResponse, createUserValidator, loginUserValidator } = require("./users.validator");
 
 // Example comments for an API endpoint
@@ -63,7 +63,19 @@ const loginUser = async (req, res) => {
   return res.status(200).json({ user: getLoginUserResponse(user) });
 }
 
+const getUser = async (req, res) => {
+  const {id, email} = req.user;
+  const user = await User.findById(id);
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  return res.status(200).json({ user: getUserResponse(user) });
+};
+
+
 module.exports = {
   createUser,
   loginUser,
+  getUser,
 };

@@ -1,7 +1,6 @@
-// Would return a different user object based on the endpoint!!!
-
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
+const { JWT_SECRET } = process.env;
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -36,6 +35,10 @@ const getLoginUserResponse = (user) => {
   return getUser(user);
 }
 
+const getUserResponse = (user) => {
+  return getUser(user);
+}
+
 const getUser = (user) => {
   return {
     email: user.email,
@@ -54,7 +57,7 @@ const getAccessToken = (user) => {
         email: user.email,
       },
     },
-    process.env.ACCESS_TOKEN_SECRET,
+    JWT_SECRET,
     { expiresIn: 60 * 60 * 24 }
   );
   return accessToken;
@@ -64,4 +67,5 @@ module.exports = {
   User: mongoose.model("User", userSchema),
   getCreateUserResponse,
   getLoginUserResponse,
+  getUserResponse,
 }
