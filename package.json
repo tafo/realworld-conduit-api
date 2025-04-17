@@ -1,0 +1,30 @@
+{
+  "name": "realworld-conduit-api",
+  "version": "1.0.0",
+  "description": "NodeJS, Express, Mongoose codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the RealWorld(https://github.com/gothinkster/realworld) spec and API.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "watch": "node src/server.js --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tafo/realworld-conduit-api.git"
+  },
+  "author": "Tayfun Yirdem",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tafo/realworld-conduit-api/issues"
+  },
+  "homepage": "https://github.com/tafo/realworld-conduit-api#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.13.2"
+  }
+}
