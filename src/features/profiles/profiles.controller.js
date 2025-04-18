@@ -7,11 +7,36 @@ const getProfile = async (req, res) => {
     return res.status(404).json({ error: "Profile not found" });
   }
 
-  const currentUser = await User.findById(req.user.id);
+  const currentUser = req.user.isAuthenticated ? await User.findById(req.user.id) : null;
 
   return res.status(200).json({ profile: getProfileResponse(profile, currentUser) });
 };
 
+const followUser = async (req, res) => {
+  const currentUser = req.user;
+  const { username } = req.params;
+
+  const targetUser = await User.findOne({ username });
+  if (!targetUser) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  if (targetUser._id.toString() === currentUser.id) {
+    return res.status(422).json({ error: "You cannot follow yourself" });
+  }
+
+  await User.findByIdAndUpdate(currentUser.id, {
+    $addToSet: { following: targetUser._id },
+  });
+
+  await User.findByIdAndUpdate(targetUser._id, {
+    $addToSet: { followers: currentUser.id },
+  });
+
+  return res.status(200).json({ profile: { ...getProfileResponse(targetUser, currentUser), following: true } });
+};
+
 module.exports = {
   getProfile,
+  followUser,
 };

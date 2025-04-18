@@ -50,9 +50,9 @@ const getProfileResponse = (user, currentUser) => {
     username: user.username,
     bio: user.bio || null,
     image: user.image || null,
-    following: user.followers.includes(currentUser._id),
+    following: currentUser ? user.followers.includes(currentUser.id) : false,
   };
-}
+};
 
 const getUser = (user) => {
   return {
