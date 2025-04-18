@@ -6,7 +6,7 @@ const {
   getLoginUserResponse,
   getUserResponse,
   getUpdateUserResponse,
-} = require("./users.model");
+} = require("../common/users.model");
 const { createUserValidator, loginUserValidator, updateUserValidator } = require("./users.validator");
 
 // Example comments for an API endpoint

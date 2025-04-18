@@ -25,6 +25,8 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 });
 
 const getCreateUserResponse = (user) => {
@@ -33,15 +35,24 @@ const getCreateUserResponse = (user) => {
 
 const getLoginUserResponse = (user) => {
   return getUser(user);
-}
+};
 
 const getUserResponse = (user) => {
   return getUser(user);
-}
+};
 
 const getUpdateUserResponse = (user) => {
   return getUser(user);
 };
+
+const getProfileResponse = (user, currentUser) => {
+  return {
+    username: user.username,
+    bio: user.bio || null,
+    image: user.image || null,
+    following: user.followers.includes(currentUser._id),
+  };
+}
 
 const getUser = (user) => {
   return {
@@ -73,4 +84,5 @@ module.exports = {
   getLoginUserResponse,
   getUserResponse,
   getUpdateUserResponse,
-}
+  getProfileResponse,
+};
